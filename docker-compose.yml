@@ -1,0 +1,41 @@
+version: '3.5'
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    ports:
+      - '${DB_PORT:-5432}:5432'
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-postgres}
+    volumes:
+      - /data/postgres:/data/postgres
+    networks:
+      - postgres
+
+  redis:
+    container_name: redis
+    image: redis:alpine
+    ports:
+      - ${REDIS_PORT:-6379}:6379
+    volumes:
+      - dr_health_redis:/data
+
+  mqtt:
+    container_name: mqtt
+    image: eclipse-mosquitto:latest
+    ports:
+      - ${MQTT_PORT:-1883}:1883
+      - 8883:8883
+      - 9001:9001
+    volumes:
+      - ./config:/mosquitto/config:rw
+      - ./data:/mosquitto/data:rw
+      - ./log:/mosquitto/log:rw
+networks:
+  postgres:
+    driver: bridge
+volumes:
+  dr_health_db:
+  dr_health_redis:
